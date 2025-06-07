@@ -28,24 +28,24 @@ import datetime
 
 
 vinted = Vinted()
-items = vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",10,1)
+items = vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=Adidas-Vintage",10,1)
 item1 = items[0]
 
 #-----------------------------------------------------------------------------------------------------------------
 
 #I can add parameters like search_text etc in the url string manually or with a function like the following to expand the capabilities.
 
-def SearchVintedDraft(order = "newest_first",price_to = "60",currency = "EUR",text = "BVB Trikot"):
+def SearchVintedDraft(order = "newest_first",price_to = "60",currency = "EUR",text = "Adidas-Vintage"):
     string = "https://www.vinted.de/vetement?order="+order+"&price_to="+price_to+"&currency="+currency+"&search_text="+text
     return vinted.items.search(string,10,1)
 
 
 def showproperties():
-   return vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",1,1)[0].raw_data
+   return vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=Adidas-Vintage",1,1)[0].raw_data
 
     
 def getlikes():
-    return vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",1,1)[0].raw_data["favourite_count"]
+    return vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=Adidas-Vintage",1,1)[0].raw_data["favourite_count"]
 #------------------------------------------------------------------------------------------------------------------
 #to work with the pictures
 items_searched = SearchVintedDraft() 
@@ -66,7 +66,7 @@ titles = [item.title for item in items_searched]
 prices = [item.price for item in items_searched]
 favourites = [item.raw_data["favourite_count"] for item in items_searched]
 Links = [item.url for item in items_searched]
-Brands = [item.brand_title for item in items_searched]    
+Brands = [item.brand_title for item in items_searched]   
 Promoted = [item.raw_data["promoted"] for item in items_searched]
 Status = [item.raw_data["status"] for item in items_searched]
 Views = [item.raw_data["view_count"] for item in items_searched]
@@ -81,6 +81,7 @@ df["Promoted"] = Promoted
 df["Status"] = Status
 df["Views"] = Views
 df["Dates"] = Dates
+
 
 #------------------------------------------------------------------------------------------------------------------
 #Show pictures of the items 
@@ -97,3 +98,6 @@ for each in items_searched:
     plt.title(each.title)
     plt.axis('off')  # Hide axes
     plt.show()
+
+
+#Next step is to store the data permanently and adding to it via different criteria
