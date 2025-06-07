@@ -36,16 +36,24 @@ item1 = items[0]
 #I can add parameters like search_text etc in the url string manually or with a function like the following to expand the capabilities.
 
 def SearchVintedDraft(order = "newest_first",price_to = "60",currency = "EUR",text = "Adidas-Vintage"):
+    """
+    Function to search on Vinted after specified search criteria, returning a list of items
+    """
+    
     string = "https://www.vinted.de/vetement?order="+order+"&price_to="+price_to+"&currency="+currency+"&search_text="+text
     return vinted.items.search(string,10,1)
 
 
+
 def showproperties():
-   return vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=Adidas-Vintage",1,1)[0].raw_data
+    """
+    Function to show the raw data of one item searched, returning a dictionary
+    Purpose only is looking stuff up
+    """
+    return vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=Adidas-Vintage",1,1)[0].raw_data
 
     
-def getlikes():
-    return vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=Adidas-Vintage",1,1)[0].raw_data["favourite_count"]
+
 #------------------------------------------------------------------------------------------------------------------
 #to work with the pictures
 items_searched = SearchVintedDraft() 
