@@ -58,7 +58,8 @@ def showproperties():
 #to work with the pictures
 items_searched = SearchVintedDraft() 
 
-df = pd.DataFrame({"Title": [],
+df = pd.DataFrame({"ID":[],
+                   "Title": [],
                    "Price":[],
                    "Favourites":[],
                    "Link":[],
@@ -71,6 +72,7 @@ df = pd.DataFrame({"Title": [],
 
 
 titles = [item.title for item in items_searched]
+IDs = [item.id for item in items_searched]
 prices = [item.price for item in items_searched]
 favourites = [item.raw_data["favourite_count"] for item in items_searched]
 Links = [item.url for item in items_searched]
@@ -80,6 +82,7 @@ Status = [item.raw_data["status"] for item in items_searched]
 Views = [item.raw_data["view_count"] for item in items_searched]
 Dates = [datetime.datetime.fromtimestamp(item.raw_timestamp) for item in items_searched]
 
+df["ID"] = IDs
 df["Title"] = titles
 df["Price"] = prices
 df["Favourites"] = favourites
