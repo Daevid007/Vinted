@@ -60,7 +60,7 @@ def showproperties():
    return vinted.items.search("https://www.vinted.fr/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",1,1)[0].raw_data
 
     
-
+properties = showproperties()
 #------------------------------------------------------------------------------------------------------------------
 #to work with the pictures
 
