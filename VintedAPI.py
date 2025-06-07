@@ -14,7 +14,9 @@ Created on Wed Jun  4 20:32:18 2025
 #git checkout -b my_new_feature   # for creating a new branch
 #git push origin my_new_feature   #pushing the branch
 
-
+#git branch  #checking current branch
+#git branch -a   #seeing and checking all branches
+#git switch <branch_name>
 
 import requests 
 from PIL import Image
@@ -60,11 +62,14 @@ def showproperties():
    return vinted.items.search("https://www.vinted.fr/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",1,1)[0].raw_data
 
     
-
+def getlikes():
+    return vinted.items.search("https://www.vinted.fr/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",1,1)[0].raw_data["favourite_count"]
 #------------------------------------------------------------------------------------------------------------------
 #to work with the pictures
 
+properties = showproperties()
 
+favs = getlikes()
 
 for each in items_searched:
     # URL of the image
