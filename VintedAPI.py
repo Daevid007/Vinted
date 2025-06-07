@@ -9,9 +9,10 @@ Created on Wed Jun  4 20:32:18 2025
 #git commit -m "Descriptive message about the changes I made"
 #git push origin main
 
+#git pull origin main    # downloading all changes made online (by others) to remote machine 
 
-
-
+#git checkout -b my_new_feature   # for creating a new branch
+#git push origin my_new_feature   #pushing the branch
 
 
 
