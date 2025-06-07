@@ -4,14 +4,25 @@ Created on Wed Jun  4 20:32:18 2025
 
 @author: David
 """
+#Git Commands:
+#git add . # stages all changes in the current directory
+#git commit -m "Descriptive message about the changes I made"
+#git push origin main
+
+
+
+
+
+
 
 import requests 
 from PIL import Image
 from io import BytesIO
 import matplotlib.pyplot as plt
-
-
 from pyVinted import Vinted
+
+
+
 vinted = Vinted()
 items = vinted.items.search("https://www.vinted.fr/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",10,1)
 item1 = items[0]
