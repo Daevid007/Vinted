@@ -60,11 +60,14 @@ def showproperties():
    return vinted.items.search("https://www.vinted.fr/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",1,1)[0].raw_data
 
     
-properties = showproperties()
+def getlikes():
+    return vinted.items.search("https://www.vinted.fr/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",1,1)[0].raw_data["favourite_count"]
 #------------------------------------------------------------------------------------------------------------------
 #to work with the pictures
 
+properties = showproperties()
 
+favs = getlikes()
 
 for each in items_searched:
     # URL of the image
