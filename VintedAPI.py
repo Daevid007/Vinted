@@ -23,63 +23,77 @@ from PIL import Image
 from io import BytesIO
 import matplotlib.pyplot as plt
 from pyVinted import Vinted
-
+import pandas as pd
+import datetime
 
 
 vinted = Vinted()
-items = vinted.items.search("https://www.vinted.fr/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",10,1)
+items = vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",10,1)
 item1 = items[0]
-#title
-item1.title
-#id
-item1.id
-#photo url
-item1.photo
-#brand
-item1.brand_title
-#price
-item1.price
-#url
-item1.url
-#currency
-item1.currency
 
 #-----------------------------------------------------------------------------------------------------------------
 
-#I can add parameterslike search_text etc in the url string manually or with a function like the following to expand the capabilities.
+#I can add parameters like search_text etc in the url string manually or with a function like the following to expand the capabilities.
 
 def SearchVintedDraft(order = "newest_first",price_to = "60",currency = "EUR",text = "BVB Trikot"):
-    string = "https://www.vinted.fr/vetement?order="+order+"&price_to="+price_to+"&currency="+currency+"&search_text="+text
-    return vinted.items.search(string,20,1)
-
-items_searched = SearchVintedDraft()
-
-for each in items_searched:
-    print(each.title,"price:",each.price,"brand",each.brand_title)
+    string = "https://www.vinted.de/vetement?order="+order+"&price_to="+price_to+"&currency="+currency+"&search_text="+text
+    return vinted.items.search(string,10,1)
 
 
 def showproperties():
-   return vinted.items.search("https://www.vinted.fr/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",1,1)[0].raw_data
+   return vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",1,1)[0].raw_data
 
     
 def getlikes():
-    return vinted.items.search("https://www.vinted.fr/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",1,1)[0].raw_data["favourite_count"]
+    return vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=BVB",1,1)[0].raw_data["favourite_count"]
 #------------------------------------------------------------------------------------------------------------------
 #to work with the pictures
+items_searched = SearchVintedDraft() 
 
-properties = showproperties()
+df = pd.DataFrame({"Title": [],
+                   "Price":[],
+                   "Favourites":[],
+                   "Link":[],
+                   "Brand Title":[],
+                   "Promoted":[],
+                   "Status":[],
+                   "Views":[],
+                   "Dates":[]})
+#------------------------------------------------------------------------------------------------------------------
 
-favs = getlikes()
 
+titles = [item.title for item in items_searched]
+prices = [item.price for item in items_searched]
+favourites = [item.raw_data["favourite_count"] for item in items_searched]
+Links = [item.url for item in items_searched]
+Brands = [item.brand_title for item in items_searched]    
+Promoted = [item.raw_data["promoted"] for item in items_searched]
+Status = [item.raw_data["status"] for item in items_searched]
+Views = [item.raw_data["view_count"] for item in items_searched]
+Dates = [datetime.datetime.fromtimestamp(item.raw_timestamp) for item in items_searched]
+
+df["Title"] = titles
+df["Price"] = prices
+df["Favourites"] = favourites
+df["Link"] = Links
+df["Brand Title"] = Brands
+df["Promoted"] = Promoted
+df["Status"] = Status
+df["Views"] = Views
+df["Dates"] = Dates
+
+#------------------------------------------------------------------------------------------------------------------
+#Show pictures of the items 
 for each in items_searched:
     # URL of the image
     url = each.photo
-
+    
     # Fetch image from URL
     response = requests.get(url)
     img = Image.open(BytesIO(response.content))
 
     # Display image
     plt.imshow(img)
+    plt.title(each.title)
     plt.axis('off')  # Hide axes
     plt.show()
