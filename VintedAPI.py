@@ -39,20 +39,21 @@ with open(json_file_path, 'r') as file:
     my_dictionary = json.load(file)
     
 vinted = Vinted()
-items = vinted.items.search("https://www.vinted.de/catalog?catalog[]=79&catalog_from=0&brand_ids[]=53&page=1",10,1)
+items = vinted.items.search("https://www.vinted.de/catalog?catalog[]=79&catalog_from=0&brand_ids[]=53&page=1&order=relevance",10,1)
 item1 = items[0]
 
 #-----------------------------------------------------------------------------------------------------------------
 
 #I can add parameters like search_text etc in the url string manually or with a function like the following to expand the capabilities.
 
-def SearchVintedDraft(order = "newest_first",price_to = "60",currency = "EUR",text = "Adidas-Vintage"):
+def SearchVintedDraft(order = "relevance",price_to = "60",currency = "EUR",text = "Adidas-Vintage"):
     """
     Function to search on Vinted after specified search criteria, returning a list of items
+    Max number of items before Client error is around 950
     """
     
-    string = "https://www.vinted.de/vetement?order="+order+"&price_to="+price_to+"&currency="+currency+"&search_text="+text
-    return vinted.items.search(string,10,1)
+    string = "https://www.vinted.de/catalog?order="+order+"&price_to="+price_to+"&currency="+currency+"&search_text="+text
+    return vinted.items.search(string,950,1)
 
 
 
@@ -62,6 +63,17 @@ def showproperties():
     Purpose only is looking stuff up
     """
     return vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=Adidas-Vintage",1,1)[0].raw_data
+
+def show_pic(url,title):
+    response = requests.get(url)
+    img = Image.open(BytesIO(response.content))
+
+    # Display image
+    plt.imshow(img)
+    plt.title(title)
+    plt.axis('off')  # Hide axes
+    plt.show()
+    
 
 def save_data_parquet(name, data):
     """
@@ -107,8 +119,9 @@ df = pd.DataFrame({"ID":[],
                    "Brand Title":[],
                    "Promoted":[],
                    "Status":[],
-                   "Views":[],
-                   "Dates":[]})
+                   "Fees":[],
+                   "Dates":[],
+                   "Photos":[]})
 #------------------------------------------------------------------------------------------------------------------
 
 #storing the retrieved data in a df format
@@ -121,8 +134,9 @@ Links = [item.url for item in items_searched]
 Brands = [item.brand_title for item in items_searched]   
 Promoted = [item.raw_data["promoted"] for item in items_searched]
 Status = [item.raw_data["status"] for item in items_searched]
-Views = [item.raw_data["view_count"] for item in items_searched]
+Fees = [item.raw_data["service_fee"]["amount"] for item in items_searched]
 Dates = [datetime.datetime.fromtimestamp(item.raw_timestamp) for item in items_searched]
+photos = [item.photo for item in items_searched]
 
 df["ID"] = IDs
 df["Title"] = titles
@@ -132,29 +146,16 @@ df["Link"] = Links
 df["Brand Title"] = Brands
 df["Promoted"] = Promoted
 df["Status"] = Status
-df["Views"] = Views
+df["Fees"] = Fees
 df["Dates"] = Dates
-
+df["Photos"] = photos
 
 #------------------------------------------------------------------------------------------------------------------
-#Show pictures of the items 
-for each in items_searched:
-    # URL of the image
-    url = each.photo
-    
-    # Fetch image from URL
-    response = requests.get(url)
-    img = Image.open(BytesIO(response.content))
-
-    # Display image
-    plt.imshow(img)
-    plt.title(each.title)
-    plt.axis('off')  # Hide axes
-    plt.show()
 
 
 #Next step is to adding to the data via different criteria
-
+#And to define the criteria structure in the json file
+#Also finding out if views can be used somehow and finding out how to get the description text and not just the titles
 #------------------------------------------------------------------------------------------------------------------
 
 #Adding all adittional data to the test_data_parquet
