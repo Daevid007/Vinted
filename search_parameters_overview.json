@@ -1,0 +1,35 @@
+{
+	"Kategorie":
+	{
+		"Damen":{
+			"Alle":"catalog[]=1904",
+			"Kleidung": {
+				"Tops & T-Shirts": {
+					"T-Shirts" : "catalog[]=221",
+					"Shirts":"catalog[]=222",
+					"Westen":"catalog[]=14"
+
+				}
+			}
+
+
+
+
+		},
+		"Herren":{
+
+
+
+
+		}
+
+	
+	},
+	"Sortieren nach":{
+		"Relevanz":"order=relevance",
+		"Höchster Preis zuerst":"price_high_to_low",
+		"Niedrigster Preis zuerst" : "price_low_to_high",
+		"Neues zuerst" : "newest_first"
+
+	}
+}

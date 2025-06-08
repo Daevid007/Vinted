@@ -25,10 +25,21 @@ import matplotlib.pyplot as plt
 from pyVinted import Vinted
 import pandas as pd
 import datetime
+import json
 
 
+
+#This is the german link: 
+#https://www.vinted.de/catalog?catalog[]=79&catalog_from=0&brand_ids[]=53&page=1
+
+#Load parameter options as a dictionary
+#This json/dic hast to be filled with data this is just the draft for structure
+json_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/search_parameters_overview.json"
+with open(json_file_path, 'r') as file:
+    my_dictionary = json.load(file)
+    
 vinted = Vinted()
-items = vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=Adidas-Vintage",10,1)
+items = vinted.items.search("https://www.vinted.de/catalog?catalog[]=79&catalog_from=0&brand_ids[]=53&page=1",10,1)
 item1 = items[0]
 
 #-----------------------------------------------------------------------------------------------------------------
