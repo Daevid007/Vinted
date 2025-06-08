@@ -56,7 +56,7 @@ def save_data_parquet(name, data):
     """
     Creates a new data parquet to store the data of found items
     """
-    parquet_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data"+name+"_data_parquet"
+    parquet_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet"
     data.to_parquet(parquet_file_path, index=False, compression='snappy')
     print(f"\nDataFrame successfully saved to {parquet_file_path}")
 
@@ -65,7 +65,7 @@ def load_data_parquet(name):
     """
     Loads a specified data_parquet into a dataframe and returns it
     """
-    return pd.read_parquet("C:/Users/David/OneDrive - fs-students.de/Vinted/Data"+name+"_data_parquet")
+    return pd.read_parquet("C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet")
 
 
 def add_data_to_parquet(name,data):
@@ -73,9 +73,9 @@ def add_data_to_parquet(name,data):
     Adds search data to an existing data parquet, saves this parquet and returns the merged DataFrame
     Also removes duplicates
     """
-    tmp = pd.read_parquet("C:/Users/David/OneDrive - fs-students.de/Vinted/Data"+name+"_data_parquet")
+    tmp = pd.read_parquet("C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet")
     data = pd.concat([tmp,data])
-    parquet_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data"+name+"_data_parquet"
+    parquet_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet"
     data = data.drop_duplicates()
     data.to_parquet(parquet_file_path, index=False, compression='snappy')
     print(f"\nDataFrame successfully saved to {parquet_file_path}")
@@ -100,6 +100,7 @@ df = pd.DataFrame({"ID":[],
                    "Dates":[]})
 #------------------------------------------------------------------------------------------------------------------
 
+#storing the retrieved data in a df format
 
 titles = [item.title for item in items_searched]
 IDs = [item.id for item in items_searched]
