@@ -52,8 +52,38 @@ def showproperties():
     """
     return vinted.items.search("https://www.vinted.de/vetement?order=newest_first&price_to=60&currency=EUR&search_text=Adidas-Vintage",1,1)[0].raw_data
 
-    
+def save_data_parquet(name, data):
+    """
+    Creates a new data parquet to store the data of found items
+    """
+    parquet_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data"+name+"_data_parquet"
+    data.to_parquet(parquet_file_path, index=False, compression='snappy')
+    print(f"\nDataFrame successfully saved to {parquet_file_path}")
 
+
+def load_data_parquet(name):
+    """
+    Loads a specified data_parquet into a dataframe and returns it
+    """
+    return pd.read_parquet("C:/Users/David/OneDrive - fs-students.de/Vinted/Data"+name+"_data_parquet")
+
+
+def add_data_to_parquet(name,data):
+    """
+    Adds search data to an existing data parquet, saves this parquet and returns the merged DataFrame
+    Also removes duplicates
+    """
+    tmp = pd.read_parquet("C:/Users/David/OneDrive - fs-students.de/Vinted/Data"+name+"_data_parquet")
+    data = pd.concat([tmp,data])
+    parquet_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data"+name+"_data_parquet"
+    data = data.drop_duplicates()
+    data.to_parquet(parquet_file_path, index=False, compression='snappy')
+    print(f"\nDataFrame successfully saved to {parquet_file_path}")
+    return data
+
+
+    
+    
 #------------------------------------------------------------------------------------------------------------------
 #to work with the pictures
 items_searched = SearchVintedDraft() 
@@ -111,4 +141,9 @@ for each in items_searched:
     plt.show()
 
 
-#Next step is to store the data permanently and adding to it via different criteria
+#Next step is to adding to the data via different criteria
+
+#------------------------------------------------------------------------------------------------------------------
+
+#Adding all adittional data to the test_data_parquet
+data = add_data_to_parquet("test", df)
