@@ -53,7 +53,7 @@ def SearchVintedDraft(order = "relevance",price_to = "60",currency = "EUR",text 
     """
     
     string = "https://www.vinted.de/catalog?order="+order+"&price_to="+price_to+"&currency="+currency+"&search_text="+text
-    return vinted.items.search(string,950,1)
+    return vinted.items.search(string,900,1)
 
 
 
@@ -156,6 +156,7 @@ df["Photos"] = photos
 #Next step is to adding to the data via different criteria
 #And to define the criteria structure in the json file
 #Also finding out if views can be used somehow and finding out how to get the description text and not just the titles
+#Checking how to use ids to find a sold item and verify if its sold
 #------------------------------------------------------------------------------------------------------------------
 
 #Adding all adittional data to the test_data_parquet
