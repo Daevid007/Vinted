@@ -9,7 +9,7 @@ Original file is located at
 # Installing modules and importing Libraries
 """
 
-pip install pyVinted #Necessary library
+
 
 import requests
 from PIL import Image
@@ -70,7 +70,7 @@ def save_data_parquet(name, data):
     """
     Creates a new data parquet to store the data of found items
     """
-    parquet_file_path = name+"_data_parquet" #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
+    parquet_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet" #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
     data.to_parquet(parquet_file_path, index=False, compression='snappy')
     print(f"\nDataFrame successfully saved to {parquet_file_path}")
 
@@ -79,7 +79,7 @@ def load_data_parquet(name):
     """
     Loads a specified data_parquet into a dataframe and returns it
     """
-    return pd.read_parquet(name+"_data_parquet")  #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
+    return pd.read_parquet("C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet")  #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
 
 
 def add_data_to_parquet(name,data):
@@ -87,9 +87,9 @@ def add_data_to_parquet(name,data):
     Adds search data to an existing data parquet, saves this parquet and returns the merged DataFrame
     Also removes duplicates
     """
-    tmp = pd.read_parquet(name+"_data_parquet")
+    tmp = pd.read_parquet("C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet")
     data = pd.concat([tmp,data])
-    parquet_file_path = name+"_data_parquet"   #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
+    parquet_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet"   #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
     data = data.drop_duplicates(subset=['ID'])
     data.to_parquet(parquet_file_path, index=False, compression='snappy')
     print(f"\nDataFrame successfully saved to {parquet_file_path}")
