@@ -193,7 +193,7 @@ def collect_data(order = "relevance",price_to = "60",currency = "EUR",parameters
   print("End parquet size:",end_parquet_size) #Print end size
   print("New data collected:",end_parquet_size-start_parquet_size) #Print how much was added
 
-collect_data(pages = 1, parameters_text = ["Adidas-Vintage Shirt","Nike-Vintage Shirt","Puma-Vintage Shirt","Vintage Shirts","Umbro-Vintage Shirt","Kappa-Vintage Shirt","Vintage T-Shirt","WRSTBHVR-Vintage","Reebook Vintage"])
+collect_data(pages = 1, parameters_text = ["Adidas-Vintage Shirt","Nike-Vintage Shirt","Puma-Vintage Shirt","Vintage Shirts","Umbro-Vintage Shirt","Kappa-Vintage Shirt","Vintage T-Shirt","WRSTBHVR-Shirt","Reebook Shirt"])
 #Default use, collecting new data to our data parquet, only 1 page seems to be possible... probably because there is just one
 
 """## Here we check the full data (which is not checked yet on if it can still be found or not
@@ -231,89 +231,104 @@ Even though I do the same in the collect data definition this here can be used t
 """
 
 #convert_duration_string_to_hours(duration) for full data
-backup_need = 1
 
-if backup_need == 1:
-  df_tmp = load_data_parquet("test")
-  df_tmp["Dates"]
-
-  current_time = datetime.datetime.now()
-
-  df_tmp["Time_Online"] = (current_time - df_tmp["Dates"])
-  df_tmp['Time_Online_H'] = df_tmp['Time_Online'].dt.total_seconds() / 3600
-  df_tmp = df_tmp.drop("Time_Online", axis=1)
-  df_tmp["Favourites_per_hour"] = df_tmp["Favourites"]/df_tmp["Time_Online_H"]
-  print(df_tmp)
-
-  save_data_parquet("test", df_tmp)
+def convert_to_time_online(name = "test"):
+    df_tmp = load_data_parquet(name)
+    df_tmp["Dates"]
+    
+    current_time = datetime.datetime.now()
+    
+    df_tmp["Time_Online"] = (current_time - df_tmp["Dates"])
+    df_tmp['Time_Online_H'] = df_tmp['Time_Online'].dt.total_seconds() / 3600
+    df_tmp = df_tmp.drop("Time_Online", axis=1)
+    df_tmp["Favourites_per_hour"] = df_tmp["Favourites"]/df_tmp["Time_Online_H"]
+    print(df_tmp)
+    
+    save_data_parquet(name, df_tmp)
+    
+convert_to_time_online()
 
 """# From here we will use the data
 So we load and show it and remove duplicates to be safe
 """
+def check_clean_data(name ="test"):
+    df = load_data_parquet(name)
+    print("Shape before:",df.shape)
+    df = df.drop_duplicates(subset=['ID'])
+    print("Shape:",df.shape)
+    return df
 
-df = load_data_parquet("test")
-print("Shape before:",df.shape)
-df = df.drop_duplicates(subset=['ID'])
-print("Shape:",df.shape)
+df = check_clean_data()
 
 """# Now I do some fundamental analysis like correlations key features and
 
 First we encode the Status column:
 """
 
-# Create an instance of the encoder, drop='first' to avoid multicollinearity, sparse_output=False for dense array
-Encoder = OneHotEncoder(drop='first', sparse_output=False)
+#------------------------------------To do change to functions-------------------------------------------------------------------------------------------
 
-# Select the columns you want to use as features
-features_df = df[["Title","Price", "Favourites", "Promoted", "Status", "Fees","Brand Title","Time_Online_H","Favourites_per_hour"]]
+def encode_status(df = df):
+    # Create an instance of the encoder, drop='first' to avoid multicollinearity, sparse_output=False for dense array
+    Encoder = OneHotEncoder(drop='first', sparse_output=False)
+    
+    # Select the columns you want to use as features
+    features_df = df[["Title","Price", "Favourites", "Promoted", "Status", "Fees","Brand Title","Time_Online_H","Favourites_per_hour"]]
+    
+    # Use fit_transform on the instance to encode the 'Status' column
+    encoded_status = Encoder.fit_transform(features_df[["Status"]])
+    
+    # Get the names of the encoded categories (excluding the dropped one)
+    encoded_category_names = Encoder.get_feature_names_out(["Status"])
+    
+    # Create a DataFrame from the encoded status data with appropriate column names
+    encoded_status_df = pd.DataFrame(encoded_status, columns=encoded_category_names, index=features_df.index)
+    
+    # Drop the original 'Status' column from the features DataFrame
+    features_df = features_df.drop("Status", axis=1)
+    
+    # Concatenate the original features (without 'Status') and the encoded status columns
+    data_encoded = pd.concat([features_df, encoded_status_df], axis=1)
+    
+    print(data_encoded.head())
+    
+    return data_encoded
 
-# Use fit_transform on the instance to encode the 'Status' column
-encoded_status = Encoder.fit_transform(features_df[["Status"]])
+data_encoded = encode_status()
 
-# Get the names of the encoded categories (excluding the dropped one)
-encoded_category_names = Encoder.get_feature_names_out(["Status"])
-
-# Create a DataFrame from the encoded status data with appropriate column names
-encoded_status_df = pd.DataFrame(encoded_status, columns=encoded_category_names, index=features_df.index)
-
-# Drop the original 'Status' column from the features DataFrame
-features_df = features_df.drop("Status", axis=1)
-
-# Concatenate the original features (without 'Status') and the encoded status columns
-data_encoded = pd.concat([features_df, encoded_status_df], axis=1)
-
-print(data_encoded.head())
 
 """Then the brand column"""
 
-encode_brands = "no"
+def encode_brands(df,encode = True):
+    if encode == True:  
+        # Create an instance of the encoder, drop='first' to avoid multicollinearity, sparse_output=False for dense array
+        Encoder = OneHotEncoder(drop='first', sparse_output=False)
+          
+        # Select the columns you want to use as features
+        features_df = df[["Title","Price", "Favourites", "Promoted", "Status_Neu","Status_Neu, mit Etikett","Status_Sehr gut","Status_Zufriedenstellend", "Fees","Brand Title","Favourites_per_hour","Time_Online_H"]]
+          
+        # Use fit_transform on the instance to encode the 'Status' column
+        encoded_status = Encoder.fit_transform(features_df[["Brand Title"]])
+          
+        # Get the names of the encoded categories (excluding the dropped one)
+        encoded_category_names = Encoder.get_feature_names_out(["Brand Title"])
+          
+        # Create a DataFrame from the encoded status data with appropriate column names
+        encoded_status_df = pd.DataFrame(encoded_status, columns=encoded_category_names, index=features_df.index)
+          
+        # Drop the original 'Status' column from the features DataFrame
+        features_df = features_df.drop("Brand Title", axis=1)
+          
+        # Concatenate the original features (without 'Status') and the encoded status columns
+        data_encoded = pd.concat([features_df, encoded_status_df], axis=1)
+    else:
+        data_encoded = df.drop("Brand Title", axis=1)
 
-if encode_brands == "yes":
-  # Create an instance of the encoder, drop='first' to avoid multicollinearity, sparse_output=False for dense array
-  Encoder = OneHotEncoder(drop='first', sparse_output=False)
+    print(data_encoded.head())
+    return data_encoded
 
-  # Select the columns you want to use as features
-  features_df = data_encoded[["Title","Price", "Favourites", "Promoted", "Status_Neu","Status_Neu, mit Etikett","Status_Sehr gut","Status_Zufriedenstellend", "Fees","Brand Title","Favourites_per_hour","Time_Online_H"]]
+encode_brands(data_encoded, encode = False)
 
-  # Use fit_transform on the instance to encode the 'Status' column
-  encoded_status = Encoder.fit_transform(features_df[["Brand Title"]])
 
-  # Get the names of the encoded categories (excluding the dropped one)
-  encoded_category_names = Encoder.get_feature_names_out(["Brand Title"])
-
-  # Create a DataFrame from the encoded status data with appropriate column names
-  encoded_status_df = pd.DataFrame(encoded_status, columns=encoded_category_names, index=features_df.index)
-
-  # Drop the original 'Status' column from the features DataFrame
-  features_df = features_df.drop("Brand Title", axis=1)
-
-  # Concatenate the original features (without 'Status') and the encoded status columns
-  data_encoded = pd.concat([features_df, encoded_status_df], axis=1)
-
-else:
-  data_encoded = data_encoded.drop("Brand Title", axis=1)
-
-print(data_encoded.head())
 
 """Here I want to see correlations as a foundation
 
