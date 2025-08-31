@@ -101,12 +101,14 @@ def add_data_to_parquet(name,data):
 #to work with the pictures
 items_searched = SearchVintedDraft()
 
-def create_search_df(items_searched):
+
 #-----------------------------------------
 
-#I should also add size here!
+#-----------------------------------------
+
 
 #------------------------------------------
+def create_search_df(items_searched):
   df = pd.DataFrame({"ID":[],
                     "Title": [],
                     "Price":[],
@@ -119,6 +121,8 @@ def create_search_df(items_searched):
                     "Dates":[],
                     "Photos":[]})
   #------------------------------------------------------------------------------------------------------------------
+    
+
 
   #storing the retrieved data in a df format
 
@@ -133,7 +137,9 @@ def create_search_df(items_searched):
   Fees = [item.raw_data["service_fee"]["amount"] for item in items_searched]
   Dates = [datetime.datetime.fromtimestamp(item.raw_timestamp) for item in items_searched]
   photos = [item.photo for item in items_searched]
-
+  sizes = [item.size_title for item in items_searched]
+  
+  
   df["ID"] = IDs
   df["Title"] = titles
   df["Price"] = prices
@@ -145,6 +151,7 @@ def create_search_df(items_searched):
   df["Fees"] = Fees
   df["Dates"] = Dates
   df["Photos"] = photos
+  df["Size"] = sizes
 
   return df
 
@@ -230,23 +237,9 @@ print(df_verification)
 Even though I do the same in the collect data definition this here can be used to update all the data, this is esspecially useful since the data from the data collect definition will be relatively new (freshly searched) and therefore biased
 """
 
-#convert_duration_string_to_hours(duration) for full data
 
-def convert_to_time_online(name = "test"):
-    df_tmp = load_data_parquet(name)
-    df_tmp["Dates"]
-    
-    current_time = datetime.datetime.now()
-    
-    df_tmp["Time_Online"] = (current_time - df_tmp["Dates"])
-    df_tmp['Time_Online_H'] = df_tmp['Time_Online'].dt.total_seconds() / 3600
-    df_tmp = df_tmp.drop("Time_Online", axis=1)
-    df_tmp["Favourites_per_hour"] = df_tmp["Favourites"]/df_tmp["Time_Online_H"]
-    print(df_tmp)
-    
-    save_data_parquet(name, df_tmp)
-    
-convert_to_time_online()
+
+
 
 """# From here we will use the data
 So we load and show it and remove duplicates to be safe
@@ -267,24 +260,24 @@ First we encode the Status column:
 
 #------------------------------------To do change to functions-------------------------------------------------------------------------------------------
 
-def encode_status(df = df):
+def encode_cols(df = df):
     # Create an instance of the encoder, drop='first' to avoid multicollinearity, sparse_output=False for dense array
     Encoder = OneHotEncoder(drop='first', sparse_output=False)
     
     # Select the columns you want to use as features
-    features_df = df[["Title","Price", "Favourites", "Promoted", "Status", "Fees","Brand Title","Time_Online_H","Favourites_per_hour"]]
+    features_df = df[["Title","Price", "Favourites", "Promoted", "Status", "Fees","Brand Title","Time_Online_H","Favourites_per_hour", "Size"]]
     
     # Use fit_transform on the instance to encode the 'Status' column
-    encoded_status = Encoder.fit_transform(features_df[["Status"]])
+    encoded_status = Encoder.fit_transform(features_df[["Status","Size","Brand Title"]])
     
     # Get the names of the encoded categories (excluding the dropped one)
-    encoded_category_names = Encoder.get_feature_names_out(["Status"])
+    encoded_category_names = Encoder.get_feature_names_out(["Status","Size","Brand Title"])
     
     # Create a DataFrame from the encoded status data with appropriate column names
     encoded_status_df = pd.DataFrame(encoded_status, columns=encoded_category_names, index=features_df.index)
     
     # Drop the original 'Status' column from the features DataFrame
-    features_df = features_df.drop("Status", axis=1)
+    features_df = features_df.drop(["Status","Size","Brand Title"], axis=1)
     
     # Concatenate the original features (without 'Status') and the encoded status columns
     data_encoded = pd.concat([features_df, encoded_status_df], axis=1)
@@ -293,40 +286,12 @@ def encode_status(df = df):
     
     return data_encoded
 
-data_encoded = encode_status()
+data_encoded = encode_cols()
 
 
 """Then the brand column"""
 
-def encode_brands(df,encode = True):
-    if encode == True:  
-        # Create an instance of the encoder, drop='first' to avoid multicollinearity, sparse_output=False for dense array
-        Encoder = OneHotEncoder(drop='first', sparse_output=False)
-          
-        # Select the columns you want to use as features
-        features_df = df[["Title","Price", "Favourites", "Promoted", "Status_Neu","Status_Neu, mit Etikett","Status_Sehr gut","Status_Zufriedenstellend", "Fees","Brand Title","Favourites_per_hour","Time_Online_H"]]
-          
-        # Use fit_transform on the instance to encode the 'Status' column
-        encoded_status = Encoder.fit_transform(features_df[["Brand Title"]])
-          
-        # Get the names of the encoded categories (excluding the dropped one)
-        encoded_category_names = Encoder.get_feature_names_out(["Brand Title"])
-          
-        # Create a DataFrame from the encoded status data with appropriate column names
-        encoded_status_df = pd.DataFrame(encoded_status, columns=encoded_category_names, index=features_df.index)
-          
-        # Drop the original 'Status' column from the features DataFrame
-        features_df = features_df.drop("Brand Title", axis=1)
-          
-        # Concatenate the original features (without 'Status') and the encoded status columns
-        data_encoded = pd.concat([features_df, encoded_status_df], axis=1)
-    else:
-        data_encoded = df.drop("Brand Title", axis=1)
 
-    print(data_encoded.head())
-    return data_encoded
-
-encode_brands(data_encoded, encode = False)
 
 
 
