@@ -174,8 +174,8 @@ def encode_cols(df):
     Encoder = OneHotEncoder(drop='first', sparse_output=False)
     
     # Select the columns you want to use as features
-    features_df = df[["Title","Price", "Favourites", "Promoted", "Status", "Fees","Brand Title","Time_Online_H","Favourites_per_hour", "Size"]]
-    
+    features_df = df
+    features_df.Dates = features_df.Dates.astype(int) // 10**9
     # Use fit_transform on the instance to encode the 'Status' column
     encoded_status = Encoder.fit_transform(features_df[["Status","Size","Brand Title"]])
     
