@@ -5,7 +5,7 @@ Created on Tue Sep  2 14:12:56 2025
 @author: david
 """
 
-
+import os
 import requests
 from PIL import Image
 from io import BytesIO
@@ -22,13 +22,13 @@ from datetime import timedelta
 
 vinted = Vinted()
 
-def SearchVintedDraft(order = "relevance",price_to = "60",currency = "EUR",text = "Adidas-Vintage", page = 1):
+def SearchVintedDraft(order = "relevance",price_to = "60",currency = "EUR",text = "Adidas-Vintage", page = 1, catalog = "77"):
     """
     Function to search on Vinted after specified search criteria, returning a list of items
     Max number of items before Client error is around 950
     """
 
-    string = "https://www.vinted.de/catalog?order="+order+"&price_to="+price_to+"&currency="+currency+"&search_text="+text
+    string = "https://www.vinted.de/catalog?order="+order+"&price_to="+price_to+"&currency="+currency+"&search_text="+text+"&catalog[]="+catalog
     return vinted.items.search(string,900,page)
 
 
@@ -61,6 +61,49 @@ def save_data_parquet(name, data):
     print(f"\nDataFrame successfully saved to {parquet_file_path}")
 
 
+
+def create_data_parquet(name):
+    data = pd.DataFrame({"ID":[],
+                        "Title": [],
+                        "Price":[],
+                        "Favourites":[],
+                        "Link":[],
+                        "Brand Title":[],
+                        "Promoted":[],
+                        "Status":[],
+                        "Fees":[],
+                        "Dates":[],
+                        "Photos":[],
+                        "Size":[],
+                        "Search_parameters":[]})
+    
+    
+    parquet_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet"   #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
+    data = data.drop_duplicates(subset=['ID'])
+    data.to_parquet(parquet_file_path, index=False, compression='snappy')
+    print(f"\nDataFrame successfully saved to {parquet_file_path}")
+    
+    if os.path.exists(parquet_file_path):
+        print(f"{parquet_file_path} created successfully.")
+    else:
+        print(f"{parquet_file_path} created not successfully.")
+
+    
+    return data
+    
+def delete_data_parquet(name):
+    
+    # Path to the file
+    file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet"
+    
+    # Check if file exists before deleting
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"{file_path} deleted successfully.")
+    else:
+        print(f"{file_path} does not exist.")
+
+    
 def load_data_parquet(name):
     """
     Loads a specified data_parquet into a dataframe and returns it
@@ -82,7 +125,7 @@ def add_data_to_parquet(name,data):
     return data
 
 
-def create_search_df(items_searched):
+def create_search_df(items_searched,search_parameters):
   df = pd.DataFrame({"ID":[],
                     "Title": [],
                     "Price":[],
@@ -93,7 +136,9 @@ def create_search_df(items_searched):
                     "Status":[],
                     "Fees":[],
                     "Dates":[],
-                    "Photos":[]})
+                    "Photos":[],
+                    "Size":[],
+                    "Search_parameters":[]})
   #------------------------------------------------------------------------------------------------------------------
     
 
@@ -126,13 +171,14 @@ def create_search_df(items_searched):
   df["Dates"] = Dates
   df["Photos"] = photos
   df["Size"] = sizes
+  df["Search_parameters"] = [search_parameters]*len(df)
 
   return df
 
 
 
 
-def collect_data(order = "relevance",price_to = "60",currency = "EUR",parameters_text = ["Adidas-Vintage","Nike-Vintage"], pages = 1):
+def collect_data(order = "relevance",price_to = "60",currency = "EUR",parameters_text = ["Adidas-Vintage","Nike-Vintage"], pages = 1,catalog = "77"):
   start_parquet_size = load_data_parquet("test").shape[0] #Saving start data size
   print("Start parquet size:",start_parquet_size)
   counter = 0
@@ -140,14 +186,20 @@ def collect_data(order = "relevance",price_to = "60",currency = "EUR",parameters
     counter += 1
     for j in range(1,pages+1):
       print("Parameter:",i, "Page:",j, "from",pages, "Parameter", counter, "from", len(parameters_text)) #Counter to keep track of progress
-      items_searched = SearchVintedDraft(order = order, price_to = price_to, currency = currency, text = i, page = j) #Simply search for the items
-      df = create_search_df(items_searched) #Creating the df for the searched items
+      items_searched = SearchVintedDraft(order = order, price_to = price_to, currency = currency, text = i, page = j,catalog = catalog) #Simply search for the items
+      search_parameters = {"order":order
+                           ,"price_to":price_to
+                           ,"currency":currency
+                           ,"Page":j,
+                           "catalog":catalog}
+      df = create_search_df(items_searched,search_parameters) #Creating the df for the searched items
       #---------------------------------
       current_time = datetime.datetime.now()
       df["Time_Online"] = (current_time - df["Dates"])
       df['Time_Online_H'] = df['Time_Online'].dt.total_seconds() / 3600
       df = df.drop("Time_Online", axis=1)
       df["Favourites_per_hour"] = df["Favourites"]/df["Time_Online_H"]
+      df.ID = df.ID.astype(int).astype(str)
       #---------------------------------
       add_data_to_parquet("test",df) # Adding the data to the parquet
       print(df.head()[["ID","Title"]])
@@ -158,6 +210,7 @@ def collect_data(order = "relevance",price_to = "60",currency = "EUR",parameters
   end_parquet_size = load_data_parquet("test").shape[0] #Saving end data size
   print("End parquet size:",end_parquet_size) #Print end size
   print("New data collected:",end_parquet_size-start_parquet_size) #Print how much was added
+
 
 
 

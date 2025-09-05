@@ -2,21 +2,23 @@
 	"Kategorie":
 	{
 		"Damen":{
-			"Alle":"catalog[]=1904",
+			"Alle":1904,
 			"Kleidung": {
 				"Tops & T-Shirts": {
-					"T-Shirts" : "catalog[]=221",
-					"Shirts":"catalog[]=222",
-					"Westen":"catalog[]=14"
-
+					"T-Shirts" : 221,
+					"Shirts": 222,
+					"Westen": 14
 				}
 			}
-
-
-
-
 		},
 		"Herren":{
+			"Alle": 5,
+			"Kleidung": {
+				"Tops & T-Shirts": {
+					"T-Shirts" : 77,
+					"Shirts": 536,
+					"Westen": 560
+				}
 
 
 
