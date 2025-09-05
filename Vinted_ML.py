@@ -12,9 +12,6 @@ import sklearn
 data_raw = vd.load_data_parquet("test")
 data_encoded = vd.encode_cols(data_raw) #Probably not enough data yet to use all columns...
 
-#Defining models
-RF = sklearn.ensemble.RandomForestRegressor(n_estimators=200,max_depth = 15,oob_score=True)
-
 
 #Defining Data
 targets = data_encoded["Price"]
@@ -31,16 +28,39 @@ features_scaled = features
 features_scaled[["Favourites","Dates","Time_Online_H","Favourites_per_hour"]] = scaler.fit_transform(features[["Favourites","Dates","Time_Online_H","Favourites_per_hour"]])
 
 
+#Defining models
+RF = sklearn.ensemble.RandomForestRegressor(n_estimators=300,max_depth = 15,oob_score=True)
+
+params_reg = {
+    "n_estimators": 300,
+    "max_depth": 15,
+    "min_samples_split": 4,
+    "learning_rate": 0.01,
+    "loss": "squared_error",
+}
+
+reg = sklearn.ensemble.GradientBoostingRegressor(**params_reg)
+
 #Training models
-
 RF.fit(X_train,Y_train)
-
+reg.fit(X_train,Y_train)
 #Evaluation
+
+
+print("Random Forest Regressor",60*"-")
 
 vd.evaluate_model(RF,X_train,X_test,Y_train,Y_test)
 
+print("Random Forest Regressor OOB Score",60*"-")
+
+if RF.oob_score == True:
+    print("Obtained oob_score:" ,RF.oob_score_)
+else:
+    print("No oob score available")
+
 # Get feature importances
 print("Feature Importances",60*"-")
+print("Random Forest Regressor",60*"-")
 importances = RF.feature_importances_
 feature_names = X_train.columns
 
@@ -54,5 +74,27 @@ feat_imp = pd.DataFrame({
 top10 = feat_imp.sort_values(by="importance", ascending=False).head(10)
 
 print("Top 10 features:",top10)
+
+
+print("Boosted Regression Model",60*"-")
+
+vd.evaluate_model(reg,X_train,X_test,Y_train,Y_test)
+# Get feature importances
+print("Feature Importances",60*"-")
+print("Boosted Regression Model",60*"-")
+importances = RF.feature_importances_
+feature_names = X_train.columns
+
+# Put into a DataFrame
+feat_imp = pd.DataFrame({
+    "feature": feature_names,
+    "importance": importances
+})
+
+# Sort and get top 10
+top10 = feat_imp.sort_values(by="importance", ascending=False).head(10)
+
+print("Top 10 features:",top10)
+
 
 

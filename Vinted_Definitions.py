@@ -287,11 +287,6 @@ def evaluate_model(model,X_train,X_test,Y_train,Y_test):
 
     #Here we evaluate on the training set
     print("Training Set",60*"-")
-    if model.oob_score == True:
-        print("Obtained oob_score:" ,model.oob_score_)
-    else:
-        print("No oob score available")
-
 
     for x,y in zip(np.round(model.predict(X_train)[0:10],2),Y_train[0:10]):
         print("Prediction on Train Set:",x,"Actual Y Target:",y)
