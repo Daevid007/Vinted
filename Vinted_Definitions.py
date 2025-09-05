@@ -24,8 +24,20 @@ from datetime import timedelta
 
 #Setting the API up
 vinted = Vinted()
-testitems = vinted.items.search("https://www.vinted.de/catalog?catalog[]=79&catalog_from=0&brand_ids[]=53&page=1&order=relevance",10,1)
-testitem1 = testitems[0]
+
+try:
+    testitems = vinted.items.search(
+        "https://www.vinted.de/catalog?catalog[]=79&catalog_from=0&brand_ids[]=53&page=1&order=relevance",
+        10, 
+        1
+    )
+    testitem1 = testitems[0] if testitems else None
+
+except Exception as e:
+    print(f"⚠️ Error while fetching items: {e}")
+    testitems = []
+    testitem1 = None
+
 
 def SearchVintedDraft(order = "relevance",price_to = "60",currency = "EUR",text = "Adidas-Vintage", page = 1, catalog = "77"):
     """
