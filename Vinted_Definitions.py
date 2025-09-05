@@ -22,7 +22,10 @@ from sklearn.preprocessing import OneHotEncoder
 import datetime
 from datetime import timedelta
 
+#Setting the API up
 vinted = Vinted()
+testitems = vinted.items.search("https://www.vinted.de/catalog?catalog[]=79&catalog_from=0&brand_ids[]=53&page=1&order=relevance",10,1)
+testitem1 = testitems[0]
 
 def SearchVintedDraft(order = "relevance",price_to = "60",currency = "EUR",text = "Adidas-Vintage", page = 1, catalog = "77"):
     """
@@ -245,12 +248,13 @@ def encode_cols(df):
     
     # Concatenate the original features (without 'Status') and the encoded status columns
     data_encoded = pd.concat([features_df, encoded_status_df], axis=1)
-    
-    print(data_encoded.head())
+
     
     data_encoded['Promoted'] = data_encoded['Promoted'].astype(int)    
     data_encoded['Price'] = pd.to_numeric(data_encoded['Price'], errors='coerce')
     data_encoded['Fees'] = pd.to_numeric(data_encoded['Fees'], errors='coerce')
+    
+    print(data_encoded.head())
     
     return data_encoded
 
@@ -299,3 +303,142 @@ def evaluate_model(model,X_train,X_test,Y_train,Y_test):
     print("MAPE:",sklearn.metrics.mean_absolute_percentage_error(np.round(model.predict(X_test),2),Y_test))
 
 
+def heatmap_vinted(data_encoded, numerical_cols):
+
+    df_for_heatmap = data_encoded[numerical_cols]
+
+    # Calculate the correlation matrix
+    correlation_matrix = df_for_heatmap.corr()
+
+    # Create the heatmap
+    plt.figure(figsize=(10, 8)) # Set the figure size for better readability
+    sns.heatmap(
+        correlation_matrix,
+        annot=True,      # Show the correlation values on the heatmap
+        cmap='plasma', # Choose a color map (e.g., 'viridis', 'plasma', 'coolwarm')
+        fmt=".2f",       # Format the annotations to two decimal places
+        linewidths=.5,   # Add lines between cells
+        cbar=True        # Show the color bar
+    )
+    plt.title('Correlation Heatmap of Vinted Items Components') # Add a title to the heatmap
+    plt.show() # Display the plot
+    print("Plots generated successfully!")
+
+def scatter_favourites(data_encoded,numerical_cols):
+    # Create scatter plots for 'Favourites' against other numerical columns
+    for col in numerical_cols:
+        if col != 'Favourites': # Plot 'Favourites' against every other column
+            plt.figure(figsize=(7, 5))
+            sns.scatterplot(x=data_encoded[col], y=data_encoded['Favourites'], alpha=0.6)
+            plt.title(f'Favourites vs. {col}')
+            plt.xlabel(col)
+            plt.xticks(rotation=45) # Rotate by 45 degrees
+            plt.ylabel('Favourites Count')
+            plt.grid(True, linestyle='--', alpha=0.7)
+            plt.show()
+
+    for col in numerical_cols:
+        if col != 'Favourites' and col != "Price" and col != "Fees": # Plot 'Favourites' against every other column
+            plt.figure(figsize=(8, 6)) # Adjust figure size for better readability
+
+            # Check if the column is more categorical/binary or continuous
+            # A simple heuristic: if unique values are few, treat as categorical
+            # Otherwise, treat as continuous and aggregate
+            if data_encoded[col].nunique() < 10 or 'Status_' in col or col == 'Promoted':
+                # Use pointplot for categorical/binary variables to show mean and CI
+                sns.pointplot(x=data_encoded[col], y=data_encoded['Favourites'], linestyles=None, errorbar='sd', capsize=0.1)
+                plt.title(f'Mean Favourites by {col}')
+                plt.xlabel(col)
+                plt.ylabel('Mean Favourites Count')
+                plt.xticks(rotation=45, ha='right') # Rotate for categorical labels
+            else:
+                # For continuous variables, calculate mean Favourites for each unique X value
+                # This aggregates the data before plotting
+                mean_favourites_by_x = data_encoded.groupby(col)['Favourites'].mean().reset_index()
+                sns.scatterplot(x=mean_favourites_by_x[col], y=mean_favourites_by_x['Favourites'], s=100, color='blue', alpha=0.8)
+                plt.title(f'Mean Favourites vs. {col} (Aggregated)')
+                plt.xlabel(col)
+                plt.ylabel('Mean Favourites Count')
+                plt.xticks(rotation=45) # Rotate for continuous labels
+
+            plt.grid(True, linestyle='--', alpha=0.7)
+            plt.tight_layout() # Adjust layout to prevent labels from running off
+            plt.show()
+    print("Plots generated successfully!")
+
+
+def plots_price_fees(data_encoded,numerical_cols):    
+    for col_rel in ['Price', 'Fees']:
+        plt.figure(figsize=(8, 6))
+        # Use regplot to show scatter points and a linear regression line
+        sns.regplot(x=data_encoded[col_rel], y=data_encoded['Favourites'], scatter_kws={'alpha':0.6}, line_kws={'color':'red'})
+        plt.title(f'Relationship between {col_rel} and Favourites')
+        plt.xlabel(col_rel)
+        plt.ylabel('Favourites Count')
+        plt.grid(True, linestyle='--', alpha=0.7)
+        plt.tight_layout()
+        plt.show()
+    
+    
+    """# I do the same with Price as the main focus point:"""
+    
+    # Convert 'Price' and 'Fees' columns to numeric
+    data_encoded['Price'] = pd.to_numeric(data_encoded['Price'], errors='coerce')
+    data_encoded['Fees'] = pd.to_numeric(data_encoded['Fees'], errors='coerce')
+    
+    # Create scatter plots for 'Price' against other numerical columns
+    for col in numerical_cols:
+        if col != 'Price': # Plot 'Price' against every other column
+            plt.figure(figsize=(7, 5))
+            sns.scatterplot(x=data_encoded[col], y=data_encoded['Price'], alpha=0.6)
+            plt.title(f'Price vs. {col}')
+            plt.xlabel(col)
+            plt.xticks(rotation=45) # Rotate by 45 degrees
+            plt.ylabel('Price Count')
+            plt.grid(True, linestyle='--', alpha=0.7)
+            plt.show()
+    
+    
+    for col in numerical_cols:
+        if col != 'Price' and col != "Favourites" and col != "Fees": # Plot 'Price' against every other column
+            plt.figure(figsize=(8, 6)) # Adjust figure size for better readability
+    
+            # Check if the column is more categorical/binary or continuous
+            # A simple heuristic: if unique values are few, treat as categorical
+            # Otherwise, treat as continuous and aggregate
+            if data_encoded[col].nunique() < 10 or 'Status_' in col or col == 'Promoted':
+                # Use pointplot for categorical/binary variables to show mean and CI
+                sns.pointplot(x=data_encoded[col], y=data_encoded['Price'], linestyles=None, errorbar='sd', capsize=0.1)
+                plt.title(f'Mean Price by {col}')
+                plt.xlabel(col)
+                plt.ylabel('Mean Price Count')
+                plt.xticks(rotation=45, ha='right') # Rotate for categorical labels
+            else:
+                # For continuous variables, calculate mean Price for each unique X value
+                # This aggregates the data before plotting
+                mean_price_by_x = data_encoded.groupby(col)['Price'].mean().reset_index()
+                sns.scatterplot(x=mean_price_by_x[col], y=mean_price_by_x['Price'], s=100, color='blue', alpha=0.8)
+                plt.title(f'Mean Price vs. {col} (Aggregated)')
+                plt.xlabel(col)
+                plt.ylabel('Mean Price Count')
+                plt.xticks(rotation=45) # Rotate for continuous labels
+    
+            plt.grid(True, linestyle='--', alpha=0.7)
+            plt.tight_layout() # Adjust layout to prevent labels from running off
+            plt.show()
+    
+    
+    
+    
+    for col_rel in ['Favourites', 'Fees']:
+        plt.figure(figsize=(8, 6))
+        # Use regplot to show scatter points and a linear regression line
+        sns.regplot(x=data_encoded[col_rel], y=data_encoded['Price'], scatter_kws={'alpha':0.6}, line_kws={'color':'red'})
+        plt.title(f'Relationship between {col_rel} and Price')
+        plt.xlabel(col_rel)
+        plt.ylabel('Price Count')
+        plt.grid(True, linestyle='--', alpha=0.7)
+        plt.tight_layout()
+        plt.show()
+    
+    print("Plots generated successfully!")

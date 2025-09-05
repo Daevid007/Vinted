@@ -12,7 +12,6 @@ import sklearn
 data_raw = vd.load_data_parquet("test")
 data_encoded = vd.encode_cols(data_raw) #Probably not enough data yet to use all columns...
 
-
 #Here I can vary
 RF = sklearn.ensemble.RandomForestRegressor(n_estimators=200,max_depth = 15,oob_score=True)
 
@@ -23,8 +22,6 @@ X_train, X_test, Y_train, Y_test = sklearn.model_selection.train_test_split(feat
 
 X_train = X_train.drop(columns = ["Title","ID","Link","Fees","Photos","Search_parameters"])
 X_test = X_test.drop(columns = ["Title","ID","Link","Fees","Photos","Search_parameters"])
-
-
 
 RF.fit(X_train,Y_train)
 
