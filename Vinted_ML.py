@@ -28,24 +28,12 @@ X_test = X_test.drop(columns = ["Title","ID","Link","Fees","Photos","Search_para
 
 RF.fit(X_train,Y_train)
 
+#Evaluation
 
-
-#Benchmark
-
-y_pred = np.full_like(Y_train, np.round(Y_train.mean(), 2), dtype=float)
-
-print("Benchmark MSE:",sklearn.metrics.mean_squared_error(y_pred,Y_train))
-print("Benchmark RMSE:",sklearn.metrics.mean_squared_error(y_pred,Y_train)**(1/2))
-print("Benchmark MAE:",sklearn.metrics.mean_absolute_error(y_pred,Y_train))
-print("MAPE:",sklearn.metrics.mean_absolute_percentage_error(y_pred,Y_train))
-
-
-#Here we evaluate on the training set
-print("Training Set",60*"-")
-print("Obtained oob_score:" ,RF.oob_score_)
-
+vd.evaluate_model(RF,X_train,X_test,Y_train,Y_test)
 
 # Get feature importances
+print("Feature Importances",60*"-")
 importances = RF.feature_importances_
 feature_names = X_train.columns
 
@@ -59,30 +47,5 @@ feat_imp = pd.DataFrame({
 top10 = feat_imp.sort_values(by="importance", ascending=False).head(10)
 
 print("Top 10 features:",top10)
-
-
-for x,y in zip(np.round(RF.predict(X_train)[0:10],2),Y_train[0:10]):
-    print("Prediction on Train Set:",x,"Actual Y Target:",y)
-    
-print("MSE:",sklearn.metrics.mean_squared_error(np.round(RF.predict(X_train),2),Y_train))
-print("RMSE:",sklearn.metrics.mean_squared_error(np.round(RF.predict(X_train),2),Y_train)**(1/2))
-print("MAE:",sklearn.metrics.mean_absolute_error(np.round(RF.predict(X_train),2),Y_train))
-print("MAPE:",sklearn.metrics.mean_absolute_percentage_error(np.round(RF.predict(X_train),2),Y_train))
-
-
-#Here we evaluate on the test set
-
-print("Test Set",60*"-")
-
-for x,y in zip(np.round(RF.predict(X_test)[0:10],2),Y_test[0:10]):
-    print("Prediction on Test Set:",x,"Actual Y Target:",y)
-    
-print("MSE:",sklearn.metrics.mean_squared_error(np.round(RF.predict(X_test),2),Y_test))
-print("RMSE:",sklearn.metrics.mean_squared_error(np.round(RF.predict(X_test),2),Y_test)**(1/2))
-print("MAE:",sklearn.metrics.mean_absolute_error(np.round(RF.predict(X_test),2),Y_test))
-print("MAPE:",sklearn.metrics.mean_absolute_percentage_error(np.round(RF.predict(X_test),2),Y_test))
-
-
-
 
 

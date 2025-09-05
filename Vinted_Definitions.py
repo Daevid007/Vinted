@@ -12,6 +12,8 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 from pyVinted import Vinted
 import pandas as pd
+import numpy as np
+import sklearn
 import datetime
 import json
 import time
@@ -178,7 +180,7 @@ def create_search_df(items_searched,search_parameters):
 
 
 
-def collect_data(order = "relevance",price_to = "60",currency = "EUR",parameters_text = ["Adidas-Vintage","Nike-Vintage"], pages = 1,catalog = "77"):
+def collect_data(name = "test",order = "relevance",price_to = "60",currency = "EUR",parameters_text = ["Adidas-Vintage","Nike-Vintage"], pages = 1,catalog = "77"):
   start_parquet_size = load_data_parquet("test").shape[0] #Saving start data size
   print("Start parquet size:",start_parquet_size)
   counter = 0
@@ -201,7 +203,7 @@ def collect_data(order = "relevance",price_to = "60",currency = "EUR",parameters
       df["Favourites_per_hour"] = df["Favourites"]/df["Time_Online_H"]
       df.ID = df.ID.astype(int).astype(str)
       #---------------------------------
-      add_data_to_parquet("test",df) # Adding the data to the parquet
+      add_data_to_parquet(name,df) # Adding the data to the parquet
       print(df.head()[["ID","Title"]])
       print()
       time.sleep(5) #To avoid errors...
@@ -251,5 +253,49 @@ def encode_cols(df):
     data_encoded['Fees'] = pd.to_numeric(data_encoded['Fees'], errors='coerce')
     
     return data_encoded
+
+
+
+def evaluate_model(model,X_train,X_test,Y_train,Y_test):
+    """
+    Parameters: model, X_train, X_test, Y_train, Y_test
+    Returns: None
+    """
+    y_pred = np.full_like(Y_train, np.round(Y_train.mean(), 2), dtype=float)
+
+    print("Benchmark MSE:",sklearn.metrics.mean_squared_error(y_pred,Y_train))
+    print("Benchmark RMSE:",sklearn.metrics.mean_squared_error(y_pred,Y_train)**(1/2))
+    print("Benchmark MAE:",sklearn.metrics.mean_absolute_error(y_pred,Y_train))
+    print("MAPE:",sklearn.metrics.mean_absolute_percentage_error(y_pred,Y_train))
+
+
+    #Here we evaluate on the training set
+    print("Training Set",60*"-")
+    if model.oob_score == True:
+        print("Obtained oob_score:" ,model.oob_score_)
+    else:
+        print("No oob score available")
+
+
+    for x,y in zip(np.round(model.predict(X_train)[0:10],2),Y_train[0:10]):
+        print("Prediction on Train Set:",x,"Actual Y Target:",y)
+        
+    print("MSE:",sklearn.metrics.mean_squared_error(np.round(model.predict(X_train),2),Y_train))
+    print("RMSE:",sklearn.metrics.mean_squared_error(np.round(model.predict(X_train),2),Y_train)**(1/2))
+    print("MAE:",sklearn.metrics.mean_absolute_error(np.round(model.predict(X_train),2),Y_train))
+    print("MAPE:",sklearn.metrics.mean_absolute_percentage_error(np.round(model.predict(X_train),2),Y_train))
+
+
+    #Here we evaluate on the test set
+
+    print("Test Set",60*"-")
+
+    for x,y in zip(np.round(model.predict(X_test)[0:10],2),Y_test[0:10]):
+        print("Prediction on Test Set:",x,"Actual Y Target:",y)
+        
+    print("MSE:",sklearn.metrics.mean_squared_error(np.round(model.predict(X_test),2),Y_test))
+    print("RMSE:",sklearn.metrics.mean_squared_error(np.round(model.predict(X_test),2),Y_test)**(1/2))
+    print("MAE:",sklearn.metrics.mean_absolute_error(np.round(model.predict(X_test),2),Y_test))
+    print("MAPE:",sklearn.metrics.mean_absolute_percentage_error(np.round(model.predict(X_test),2),Y_test))
 
 
