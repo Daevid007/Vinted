@@ -10,7 +10,7 @@ import pandas as pd
 import Vinted_Definitions as vd
 
 #What File?
-name = "test2"
+name = "test"
 
 #Creating Files
 create = False
@@ -28,9 +28,9 @@ if load == True:
     loaded_data = vd.load_data_parquet(name)
     
 #Collecting Data
-collect = False
+collect = True
 if collect == True:
-    vd.collect_data()
+    vd.collect_data(parameters_text = ["Adidas-Vintage","Nike-Vintage","Reebook-Vintage","Puma-Vintage","WRSTBHVR","Kappa-Vintage"])
     
 #Check_cleaning
 check = False

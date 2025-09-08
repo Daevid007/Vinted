@@ -282,7 +282,7 @@ def evaluate_model(model,X_train,X_test,Y_train,Y_test):
     print("Benchmark MSE:",sklearn.metrics.mean_squared_error(y_pred,Y_train))
     print("Benchmark RMSE:",sklearn.metrics.mean_squared_error(y_pred,Y_train)**(1/2))
     print("Benchmark MAE:",sklearn.metrics.mean_absolute_error(y_pred,Y_train))
-    print("MAPE:",sklearn.metrics.mean_absolute_percentage_error(y_pred,Y_train))
+    print("Benchmark MAPE:",sklearn.metrics.mean_absolute_percentage_error(y_pred,Y_train))
 
 
     #Here we evaluate on the training set

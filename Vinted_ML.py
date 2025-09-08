@@ -29,13 +29,13 @@ features_scaled[["Favourites","Dates","Time_Online_H","Favourites_per_hour"]] = 
 
 
 #Defining models
-RF = sklearn.ensemble.RandomForestRegressor(n_estimators=300,max_depth = 15,oob_score=True)
+RF = sklearn.ensemble.RandomForestRegressor(n_estimators=300, max_depth = 15,min_samples_leaf=2, oob_score=True)
 
 params_reg = {
     "n_estimators": 300,
-    "max_depth": 15,
-    "min_samples_split": 4,
-    "learning_rate": 0.01,
+    "max_depth": 5,
+    "min_samples_split": 5,
+    "learning_rate": 0.04,
     "loss": "squared_error",
 }
 
