@@ -30,7 +30,34 @@ if load == True:
 #Collecting Data
 collect = True
 if collect == True:
-    vd.collect_data(parameters_text = ["Adidas-Vintage","Nike-Vintage","Reebook-Vintage","Puma-Vintage","WRSTBHVR","Kappa-Vintage"])
+    vd.collect_data(parameters_text = ["Adidas-Vintage","Nike-Vintage","Reebook-Vintage","Puma-Vintage","WRSTBHVR","Kappa-Vintage",    "Puma Archive",
+    "Reebok Classics",
+    "Fila Vintage",
+    "Champion Reverse Weave",
+    "Ellesse Heritage",
+    "Kappa Authentic",
+    "Umbro Classics",
+    "Diadora Heritage",
+    "Lacoste Sport Vintage",
+    "Levi's Vintage Clothing",
+    "Carhartt WIP",
+    "Patagonia Retro",
+    "The North Face Vintage",
+    "Columbia Sportswear Vintage",
+    "Tommy Hilfiger Classics",
+    "Ralph Lauren Polo Sport",
+    "Converse Vintage",
+    "Vans Classics",
+    "New Balance Heritage",
+    "Asics Onitsuka Tiger",
+    "Starter Vintage",
+    "Russell Athletic Vintage",
+    "Nautica Competition",
+    "Dickies Vintage",
+    "Wrangler Retro",
+    "Lee Jeans Vintage",
+    "Timberland Heritage",
+    "Jordan Brand Retro"])
     
 #Check_cleaning
 check = False

@@ -73,7 +73,7 @@ def save_data_parquet(name, data):
     """
     Creates a new data parquet to store the data of found items
     """
-    parquet_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet" #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
+    parquet_file_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
     data.to_parquet(parquet_file_path, index=False, compression='snappy')
     print(f"\nDataFrame successfully saved to {parquet_file_path}")
 
@@ -95,7 +95,7 @@ def create_data_parquet(name):
                         "Search_parameters":[]})
     
     
-    parquet_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet"   #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
+    parquet_file_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
     data = data.drop_duplicates(subset=['ID'])
     data.to_parquet(parquet_file_path, index=False, compression='snappy')
     print(f"\nDataFrame successfully saved to {parquet_file_path}")
@@ -111,7 +111,7 @@ def create_data_parquet(name):
 def delete_data_parquet(name):
     
     # Path to the file
-    file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet"
+    file_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
     
     # Check if file exists before deleting
     if os.path.exists(file_path):
@@ -125,7 +125,9 @@ def load_data_parquet(name):
     """
     Loads a specified data_parquet into a dataframe and returns it
     """
-    return pd.read_parquet("C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet")  #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
+    return pd.read_parquet("https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true")  #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
+
+
 
 
 def add_data_to_parquet(name,data):
@@ -135,7 +137,7 @@ def add_data_to_parquet(name,data):
     """
     tmp = pd.read_parquet("C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet")
     data = pd.concat([tmp,data])
-    parquet_file_path = "C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet"   #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
+    parquet_file_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
     data = data.drop_duplicates(subset=['ID'])
     data.to_parquet(parquet_file_path, index=False, compression='snappy')
     print(f"\nDataFrame successfully saved to {parquet_file_path}")
