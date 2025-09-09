@@ -95,7 +95,9 @@ def create_data_parquet(name):
                         "Search_parameters":[]})
     
     
-    parquet_file_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
+    parquet_file_path = parquet_file_path = r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\" + name + "_data_parquet"
+
+    #"https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
     data = data.drop_duplicates(subset=['ID'])
     data.to_parquet(parquet_file_path, index=False, compression='snappy')
     print(f"\nDataFrame successfully saved to {parquet_file_path}")

@@ -10,10 +10,10 @@ import pandas as pd
 import Vinted_Definitions as vd
 
 #What File?
-name = "test"
+name = "test2"
 
 #Creating Files
-create = False
+create = True
 if create == True:
     vd.create_data_parquet(name)
 
@@ -23,12 +23,12 @@ if delete == True:
     vd.delete_data_parquet(name)
 
 #Loading Files
-load = False
+load = True
 if load == True:
     loaded_data = vd.load_data_parquet(name)
     
 #Collecting Data
-collect = True
+collect = False
 if collect == True:
     vd.collect_data(parameters_text = ["Adidas-Vintage","Nike-Vintage","Reebook-Vintage","Puma-Vintage","WRSTBHVR","Kappa-Vintage",    "Puma Archive",
     "Reebok Classics",
