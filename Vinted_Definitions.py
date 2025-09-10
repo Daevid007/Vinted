@@ -69,17 +69,17 @@ def show_pic(url,title):
 
 """# Here define functions to work with the data parquet (which has to be down and uploaded manually in the notebook environment)"""
 
-def save_data_parquet(name, data):
+def save_data_parquet(name, data, parquet_file_path):
     """
     Creates a new data parquet to store the data of found items
     """
-    parquet_file_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
+
     data.to_parquet(parquet_file_path, index=False, compression='snappy')
     print(f"\nDataFrame successfully saved to {parquet_file_path}")
 
 
 
-def create_data_parquet(name):
+def create_data_parquet(name, parquet_file_path):
     data = pd.DataFrame({"ID":[],
                         "Title": [],
                         "Price":[],
@@ -93,11 +93,7 @@ def create_data_parquet(name):
                         "Photos":[],
                         "Size":[],
                         "Search_parameters":[]})
-    
-    
-    parquet_file_path = parquet_file_path = r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\" + name + "_data_parquet"
-
-    #"https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
+  
     data = data.drop_duplicates(subset=['ID'])
     data.to_parquet(parquet_file_path, index=False, compression='snappy')
     print(f"\nDataFrame successfully saved to {parquet_file_path}")
@@ -110,36 +106,34 @@ def create_data_parquet(name):
     
     return data
     
-def delete_data_parquet(name):
+def delete_data_parquet(name, parquet_file_path):
     
     # Path to the file
-    file_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
     
     # Check if file exists before deleting
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        print(f"{file_path} deleted successfully.")
+    if os.path.exists(parquet_file_path):
+        os.remove(parquet_file_path)
+        print(f"{parquet_file_path} deleted successfully.")
     else:
-        print(f"{file_path} does not exist.")
+        print(f"{parquet_file_path} does not exist.")
 
     
-def load_data_parquet(name):
+def load_data_parquet(name, parquet_file_path):
     """
     Loads a specified data_parquet into a dataframe and returns it
     """
-    return pd.read_parquet("https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true")  #HAS TO BE CHANGED EVENTUALLY DEPENDING ON DEVICE
+    return pd.read_parquet(parquet_file_path)  
 
 
 
 
-def add_data_to_parquet(name,data):
+def add_data_to_parquet(name,data,parquet_file_path):
     """
     Adds search data to an existing data parquet, saves this parquet and returns the merged DataFrame
     Also removes duplicates
     """
-    tmp = pd.read_parquet("C:/Users/David/OneDrive - fs-students.de/Vinted/Data/"+name+"_data_parquet")
+    tmp = pd.read_parquet(parquet_file_path)
     data = pd.concat([tmp,data])
-    parquet_file_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
     data = data.drop_duplicates(subset=['ID'])
     data.to_parquet(parquet_file_path, index=False, compression='snappy')
     print(f"\nDataFrame successfully saved to {parquet_file_path}")
@@ -199,7 +193,7 @@ def create_search_df(items_searched,search_parameters):
 
 
 
-def collect_data(name = "test",order = "relevance",price_to = "60",currency = "EUR",parameters_text = ["Adidas-Vintage","Nike-Vintage"], pages = 1,catalog = "77"):
+def collect_data(parquet_file_path, name = "test",order = "relevance",price_to = "60",currency = "EUR",parameters_text = ["Adidas-Vintage","Nike-Vintage"], pages = 1,catalog = "77"):
   start_parquet_size = load_data_parquet("test").shape[0] #Saving start data size
   print("Start parquet size:",start_parquet_size)
   counter = 0
@@ -222,7 +216,7 @@ def collect_data(name = "test",order = "relevance",price_to = "60",currency = "E
       df["Favourites_per_hour"] = df["Favourites"]/df["Time_Online_H"]
       df.ID = df.ID.astype(int).astype(str)
       #---------------------------------
-      add_data_to_parquet(name,df) # Adding the data to the parquet
+      add_data_to_parquet(name,df,parquet_file_path) # Adding the data to the parquet
       print(df.head()[["ID","Title"]])
       print()
       time.sleep(5) #To avoid errors...
@@ -235,8 +229,8 @@ def collect_data(name = "test",order = "relevance",price_to = "60",currency = "E
 
 
 
-def check_clean_data(name ="test"):
-    df = load_data_parquet(name)
+def check_clean_data(name ="test",parquet_file_path = "https://github.com/Daevid007/Vinted/blob/main/Data/test_data_parquet?raw=true"):
+    df = load_data_parquet(name,parquet_file_path=parquet_file_path)
     print("Shape before:",df.shape)
     df = df.drop_duplicates(subset=['ID'])
     print("Shape:",df.shape)

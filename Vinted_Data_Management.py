@@ -12,20 +12,26 @@ import Vinted_Definitions as vd
 #What File?
 name = "test2"
 
+#Pathes
+git_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
+local_path_1 = r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data"+name+"_data_parquet"
+
+
+
 #Creating Files
 create = False
 if create == True:
-    vd.create_data_parquet(name)
+    vd.create_data_parquet(name,local_path_1)
 
 #Deleting Files
-delete = False
+delete = True
 if delete == True:
-    vd.delete_data_parquet(name)
+    vd.delete_data_parquet(name,local_path_1)
 
 #Loading Files
 load = False
 if load == True:
-    loaded_data = vd.load_data_parquet(name)
+    loaded_data = vd.load_data_parquet(name,git_path)
     
 #Collecting Data
 list1 = ["Adidas-Vintage","Nike-Vintage","Reebook-Vintage","Puma-Vintage","WRSTBHVR","Kappa-Vintage",    "Puma Archive",
@@ -53,15 +59,19 @@ list1 = ["Adidas-Vintage","Nike-Vintage","Reebook-Vintage","Puma-Vintage","WRSTB
 "Nautica Competition",
 "Dickies Vintage",
 "Wrangler Retro",
-"Lee Jeans Vintage",
+"Lee Vintage",
 "Timberland Heritage",
 "Jordan Brand Retro"]
 
 list2 = ["Adidas-Vintage"]
-collect = True
+
+
+collect = False
 if collect == True:
-    vd.collect_data(parameters_text = list2)
+    vd.collect_data(parameters_text = list2,parquet_file_path=local_path_1)
+    
+    
 #Check_cleaning
 check = False
 if check == True:
-    vd.check_clean_data(name)
+    vd.check_clean_data(name,parquet_file_path=git_path)
