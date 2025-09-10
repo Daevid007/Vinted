@@ -24,7 +24,7 @@ if create == True:
     vd.create_data_parquet(name,local_path_1)
 
 #Deleting Files
-delete = False
+delete = True
 if delete == True:
     vd.delete_data_parquet(name,local_path_1)
 
@@ -66,7 +66,7 @@ list1 = ["Adidas-Vintage","Nike-Vintage","Reebook-Vintage","Puma-Vintage","WRSTB
 list2 = ["Adidas-Vintage"]
 
 
-collect = True
+collect = False
 if collect == True:
     vd.collect_data(parameters_text = list2,parquet_file_path=local_path_1,name = name)
     
