@@ -194,7 +194,7 @@ def create_search_df(items_searched,search_parameters):
 
 
 def collect_data(parquet_file_path, name = "test",order = "relevance",price_to = "60",currency = "EUR",parameters_text = ["Adidas-Vintage","Nike-Vintage"], pages = 1,catalog = "77"):
-  start_parquet_size = load_data_parquet("test").shape[0] #Saving start data size
+  start_parquet_size = load_data_parquet(name,parquet_file_path).shape[0] #Saving start data size
   print("Start parquet size:",start_parquet_size)
   counter = 0
   for i in (parameters_text): #We iterate trough the searched text parameters and...
@@ -222,7 +222,7 @@ def collect_data(parquet_file_path, name = "test",order = "relevance",price_to =
       time.sleep(5) #To avoid errors...
       #--------------- Here I should add some prevention so the web scraping does not go well or so
 
-  end_parquet_size = load_data_parquet("test").shape[0] #Saving end data size
+  end_parquet_size = load_data_parquet(name = name, parquet_file_path=parquet_file_path).shape[0] #Saving end data size
   print("End parquet size:",end_parquet_size) #Print end size
   print("New data collected:",end_parquet_size-start_parquet_size) #Print how much was added
 
@@ -233,7 +233,7 @@ def check_clean_data(name ="test",parquet_file_path = "https://github.com/Daevid
     df = load_data_parquet(name,parquet_file_path=parquet_file_path)
     print("Shape before:",df.shape)
     df = df.drop_duplicates(subset=['ID'])
-    print("Shape:",df.shape)
+    print("Shape after:",df.shape)
     return df
 
 

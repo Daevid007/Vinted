@@ -19,7 +19,7 @@ local_path_1 = r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\"+name+"_
 
 
 #Creating Files
-create = True
+create = False
 if create == True:
     vd.create_data_parquet(name,local_path_1)
 
@@ -66,9 +66,9 @@ list1 = ["Adidas-Vintage","Nike-Vintage","Reebook-Vintage","Puma-Vintage","WRSTB
 list2 = ["Adidas-Vintage"]
 
 
-collect = False
+collect = True
 if collect == True:
-    vd.collect_data(parameters_text = list2,parquet_file_path=local_path_1)
+    vd.collect_data(parameters_text = list2,parquet_file_path=local_path_1,name = name)
     
     
 #Check_cleaning
