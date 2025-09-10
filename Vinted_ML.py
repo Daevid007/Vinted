@@ -9,8 +9,21 @@ import pandas as pd
 import Vinted_Definitions as vd
 import sklearn 
 
-data_raw = vd.load_data_parquet("test")
-data_encoded = vd.encode_cols(data_raw) #Probably not enough data yet to use all columns...
+#------------------------------------------------------Adjustable-----------------------------------------------------
+
+#File
+name = "test"
+
+#Pathes
+git_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
+local_path_1 = r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\"+name+"_data_parquet"
+#r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\"+name+"_data_parquet"
+
+#--------------------------------------------------------------------------------------------------------------------
+
+data = vd.load_data_parquet(name,git_path)
+
+data_encoded = vd.encode_cols(data) 
 
 
 #Defining Data

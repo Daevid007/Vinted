@@ -9,9 +9,19 @@ import numpy as np
 import pandas as pd
 import Vinted_Definitions as vd
 
-#What file?
+#------------------------------------------------------Adjustable-----------------------------------------------------
+
+#File
 name = "test"
-data = vd.load_data_parquet(name)
+
+#Pathes
+git_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
+local_path_1 = r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\"+name+"_data_parquet"
+#r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\"+name+"_data_parquet"
+
+#--------------------------------------------------------------------------------------------------------------------
+
+data = vd.load_data_parquet(name,parquet_file_path = git_path)
 
 numerical_cols = [
         'Price', 'Favourites', 'Promoted', 'Fees', 'Status_Neu',
