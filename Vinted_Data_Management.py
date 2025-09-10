@@ -14,17 +14,17 @@ name = "test2"
 
 #Pathes
 git_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
-local_path_1 = r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data"+name+"_data_parquet"
+local_path_1 = r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\"+name+"_data_parquet"
 
 
 
 #Creating Files
-create = False
+create = True
 if create == True:
     vd.create_data_parquet(name,local_path_1)
 
 #Deleting Files
-delete = True
+delete = False
 if delete == True:
     vd.delete_data_parquet(name,local_path_1)
 
