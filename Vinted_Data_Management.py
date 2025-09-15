@@ -48,9 +48,10 @@ if load == True:
     loaded_data = vd.load_data_parquet(name,git_path)
     
     
-collect = False
+collect = True
 if collect == True:
-    vd.collect_data(parameters_text = list2,parquet_file_path=local_path_1,name = name)
+    
+    vd.collect_data(parameters_text = list1,parquet_file_path=local_path_1,name = name)
     
     
 #Check_cleaning
