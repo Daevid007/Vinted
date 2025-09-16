@@ -42,19 +42,23 @@ features_scaled[["Favourites","Dates","Time_Online_H","Favourites_per_hour"]] = 
 
 
 #Defining models
-RF = sklearn.ensemble.RandomForestRegressor(n_estimators=300, max_depth = 15,min_samples_leaf=2, oob_score=True)
+RF = sklearn.ensemble.RandomForestRegressor(n_estimators=200, max_depth = 15 ,min_samples_leaf=2, oob_score=True)
 
 params_reg = {
-    "n_estimators": 300,
-    "max_depth": 5,
-    "min_samples_split": 5,
-    "learning_rate": 0.04,
+    "n_estimators": 200,
+    "max_depth": 8,
+    "min_samples_split": 4,
+    
+    "learning_rate": 0.03,
     "loss": "squared_error",
 }
 
 reg = sklearn.ensemble.GradientBoostingRegressor(**params_reg)
 
+Lreg = sklearn.linear_model.LinearRegression(fit_intercept = False)
+
 #Training models
+Lreg.fit(X_train,Y_train)
 RF.fit(X_train,Y_train)
 reg.fit(X_train,Y_train)
 #Evaluation
@@ -110,4 +114,5 @@ top10 = feat_imp.sort_values(by="importance", ascending=False).head(10)
 print("Top 10 features:",top10)
 
 
-
+print("Linear Regressor",60*"-")
+vd.evaluate_model(Lreg,X_train,X_test,Y_train,Y_test)
