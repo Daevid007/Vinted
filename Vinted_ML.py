@@ -31,7 +31,6 @@ targets = data_encoded["Price"]
 features = data_encoded.drop(columns="Price")
 features = features.drop(columns = ["Title","ID","Link","Fees","Photos","Search_parameters"])
 
-X_train, X_test, Y_train, Y_test = sklearn.model_selection.train_test_split(features,targets, test_size = 0.33)
 
 scaler = sklearn.preprocessing.StandardScaler()
 targets_scaled = scaler.fit_transform(targets.to_frame())
@@ -40,6 +39,9 @@ targets_scaled = targets_scaled.flatten()
 features_scaled = features
 features_scaled[["Favourites","Dates","Time_Online_H","Favourites_per_hour"]] = scaler.fit_transform(features[["Favourites","Dates","Time_Online_H","Favourites_per_hour"]])
 
+X_train, X_test, Y_train, Y_test = sklearn.model_selection.train_test_split(features,targets, test_size = 0.33)
+
+print("Successfully prepared data")
 
 #Defining models
 RF = sklearn.ensemble.RandomForestRegressor(n_estimators=200, max_depth = 15 ,min_samples_leaf=2, oob_score=True)
@@ -56,6 +58,8 @@ params_reg = {
 reg = sklearn.ensemble.GradientBoostingRegressor(**params_reg)
 
 Lreg = sklearn.linear_model.LinearRegression(fit_intercept = False)
+
+print("Started training models")
 
 #Training models
 Lreg.fit(X_train,Y_train)
