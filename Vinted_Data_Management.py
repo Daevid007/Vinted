@@ -10,6 +10,14 @@ import pandas as pd
 import Vinted_Definitions as vd
 
 #------------------------------------------------------Adjustable-----------------------------------------------------
+#IMG
+name_img = "test2"
+link_img = r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\"+name_img+"_data_img.h5"
+name_img_parquet = "test2"
+link_img_parquet = r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\"+name_img_parquet+"_data_parquet"
+
+
+
 
 #File
 name = "test"
@@ -69,7 +77,7 @@ if load == True:
     
 collect = False
 if collect == True:
-    vd.collect_data(parameters_text = list1,parquet_file_path=local_path_1,name = name)
+    collected_data = vd.collect_data(parameters_text = list1,parquet_file_path=local_path_1,name = name)
     
     
 #Check_cleaning
@@ -78,6 +86,19 @@ if check == True:
     vd.check_clean_data(name,parquet_file_path=git_path)
     
 #Saving Files
-save = True
+save = False
 if save == True:
     vd.save_data_parquet(name_2, data, parquet_file_path = local_path_2)
+    
+#Loading img df
+load_img = True
+if load_img == True:
+    encoded_img_data = vd.load_img_data(file_path=link_img, parquet_file_path=link_img_parquet)
+    
+    
+#Encoding and Storing imgs
+img = True
+if img == True:
+    vd.store_img_data(df = vd.add_image_array_data(df_unloaded = loaded_data.loc[800:900,:], df_loaded = encoded_img_data), link = link_img, parquet_file_path=link_img_parquet)
+    
+

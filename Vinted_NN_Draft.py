@@ -11,8 +11,14 @@ import Vinted_Definitions as vd
 import sklearn 
 
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.neural_network import MLPRegressor
 
+import tensorflow as tf
+
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
+from tensorflow.keras import regularizers
+
+import matplotlib.pyplot as plt
 
 #------------------------------------------------------Adjustable-----------------------------------------------------
 
@@ -50,22 +56,13 @@ print("Successfully prepared data")
 
 #--------------------------------------------------------------------------------------------------------------------
 
-mlp = MLPRegressor(
-    hidden_layer_sizes=(236,118, 64, 32, 16),   # two hidden layers with 64 neurons each
-    activation='relu',             # common choices: 'relu', 'tanh'
-    solver='adam',                 # optimizer: 'adam' (default), 'lbfgs', or 'sgd'
-    learning_rate='adaptive',
-    max_iter=1000,                 # increase if training doesn’t converge
-    random_state=42,
-    early_stopping = True
-)
+cnn = Sequential()
 
 print("Started Training")
 
-mlp.fit(X_train, Y_train)
+cnn.fit(X_train, Y_train)
 
 print("Started evaluation MLP Regressor")
-vd.evaluate_model(mlp,X_train,X_test,Y_train,Y_test)
+vd.evaluate_model(cnn,X_train,X_test,Y_train,Y_test)
 
 print("R2:")
-print(mlp.score(X_test,Y_test))

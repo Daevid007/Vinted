@@ -22,7 +22,8 @@ from sklearn.preprocessing import OneHotEncoder
 import datetime
 from datetime import timedelta
 import math
-
+from tqdm import tqdm
+import h5py
 #Setting the API up
 vinted = Vinted()
 
@@ -466,15 +467,25 @@ def load_image_from_url(url, size=(128, 128)):
         return 0,np.zeros((size[1], size[0], 3), dtype=np.uint8)  # Black image
 
 
+
 def add_image_arrays_column(df, url_col='image_url', size=(128,128)):
     """
     Adds a new column 'image_array' to df containing image data as 3D NumPy arrays.
+    Shows progress with a tqdm progress bar.
     """
-    df['image_array'] = df[url_col].apply(lambda x: load_image_from_url(x, size=size)[1])
-    df['Photo_available'] = df[url_col].apply(lambda x: load_image_from_url(x, size=size)[0])
+    image_arrays = []
+    photo_available = []
+
+    for url in tqdm(df[url_col], desc="Loading images"):
+        available, array = load_image_from_url(url, size=size)
+        photo_available.append(available)
+        image_arrays.append(array)
+
+    df['image_array'] = image_arrays
+    df['Photo_available'] = photo_available
     return df
 
-#dftest = add_image_arrays_column(loaded_data.loc[0:100,:],url_col = "Photos")    
+#dftest = add_image_arrays_column(loaded_data.loc[0:200,:],url_col = "Photos")    
 
 def plot_images_from_df(df, image_col='image_array', max_per_row=5, figsize_per_image=(3,3)):
     """
@@ -509,5 +520,59 @@ def plot_images_from_df(df, image_col='image_array', max_per_row=5, figsize_per_
     plt.tight_layout()
     plt.show()
     
-#plot_images_from_df(dftest, image_col='image_array', max_per_row=3)
+#plot_images_from_df(dftest.loc[0:11,:], image_col='image_array', max_per_row=3)
 
+
+def add_image_array_data(df_unloaded, df_loaded):
+    df_new_data = df_unloaded.loc[~df_unloaded["ID"].isin(df_loaded["ID"]), :]
+    df_new_data = add_image_arrays_column(df_new_data,url_col = "Photos")
+    return pd.concat([df_loaded,df_new_data], axis = 0)
+
+#df_new = add_image_array_data(df_unloaded = loaded_data.loc[400:600,:], df_loaded = dftest)
+
+def store_img_data(link, df, parquet_file_path):
+    arrays = np.stack(df["image_array"].values)
+    labels = df["ID"].astype(str).values
+    
+    
+    with h5py.File(link, "w") as f:
+        str_dtype = h5py.string_dtype(encoding='utf-8')
+        f.create_dataset("images", data=arrays, compression="gzip")
+        f.create_dataset("ID", data=labels, dtype=str_dtype)
+    
+    df = df.drop(columns = ["image_array"])
+    df.to_parquet(parquet_file_path, index=False, compression='snappy')
+    print(f"\nDataFrame successfully saved to {parquet_file_path}")
+    
+    if os.path.exists(parquet_file_path):
+        print(f"{parquet_file_path} created successfully.")
+    else:
+        print(f"{parquet_file_path} created not successfully.")
+
+        
+def load_img_data(file_path, parquet_file_path):
+    """
+    Loads image data and IDs from an HDF5 file and returns a pandas DataFrame
+    with columns ['ID', 'image_array'].
+    """
+    with h5py.File(file_path, "r") as f:
+        print("Datasets found in file:", list(f.keys()))  # e.g. ['images', 'ID']
+        
+        ids = f["ID"][:].astype(str)   
+        images = f["images"][:]  # shape (N, 128, 128, 3)
+
+    # Combine into a DataFrame
+    df = pd.DataFrame({
+        "ID": ids,
+        "image_array": list(images)  # convert ndarray of arrays into list for storage
+    })
+
+    df_tmp = pd.read_parquet(parquet_file_path) 
+    
+    df = pd.merge(df, df_tmp, on="ID", how="inner")
+
+    return df
+        
+#df_lmtest = load_img_data(file_path=link_img, parquet_file_path=link_img_parquet)
+    
+    
