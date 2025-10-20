@@ -13,10 +13,29 @@ import Vinted_Definitions as vd
 
 #File
 name = "test"
+name_2 = "test2"
+
+data = pd.DataFrame({"ID":[],
+                    "Title": [],
+                    "Price":[],
+                    "Favourites":[],
+                    "Link":[],
+                    "Brand Title":[],
+                    "Promoted":[],
+                    "Status":[],
+                    "Fees":[],
+                    "Dates":[],
+                    "Photos":[],
+                    "Size":[],
+                    "Search_parameters":[]})
 
 #Pathes
 git_path = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name+"_data_parquet?raw=true"
+git_path_2 = "https://github.com/Daevid007/Vinted/blob/main/Data/"+name_2+"_data_parquet?raw=true"
+
 local_path_1 = r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\"+name+"_data_parquet"
+local_path_2 = r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\"+name_2+"_data_parquet"
+
 #r"C:\Users\david\OneDrive - fs-students.de\Vinted\Data\\"+name+"_data_parquet"
 
 #Collecting Data
@@ -43,14 +62,13 @@ if delete == True:
 
 
 #Loading Files
-load = False
+load = True
 if load == True:
-    loaded_data = vd.load_data_parquet(name,git_path)
+    loaded_data = vd.load_data_parquet(name,local_path_1)
     
     
-collect = True
+collect = False
 if collect == True:
-    
     vd.collect_data(parameters_text = list1,parquet_file_path=local_path_1,name = name)
     
     
@@ -58,3 +76,8 @@ if collect == True:
 check = False
 if check == True:
     vd.check_clean_data(name,parquet_file_path=git_path)
+    
+#Saving Files
+save = True
+if save == True:
+    vd.save_data_parquet(name_2, data, parquet_file_path = local_path_2)

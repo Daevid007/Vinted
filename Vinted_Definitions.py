@@ -21,6 +21,7 @@ import seaborn as sns
 from sklearn.preprocessing import OneHotEncoder
 import datetime
 from datetime import timedelta
+import math
 
 #Setting the API up
 vinted = Vinted()
@@ -124,21 +125,15 @@ def load_data_parquet(name, parquet_file_path):
     """
     return pd.read_parquet(parquet_file_path)  
 
-
-
-
 def add_data_to_parquet(name,data,parquet_file_path):
     """
-    Adds search data to an existing data parquet, saves this parquet and returns the merged DataFrame
+    Saves data as a data parquet, returns the DataFrame
     Also removes duplicates
     """
-    tmp = pd.read_parquet(parquet_file_path)
-    data = pd.concat([tmp,data])
     data = data.drop_duplicates(subset=['ID'])
     data.to_parquet(parquet_file_path, index=False, compression='snappy')
     print(f"\nDataFrame successfully saved to {parquet_file_path}")
     return data
-
 
 def create_search_df(items_searched,search_parameters):
   df = pd.DataFrame({"ID":[],
@@ -447,3 +442,72 @@ def plots_price_fees(data_encoded,numerical_cols):
         plt.show()
     
     print("Plots generated successfully!")
+    
+    
+    
+def encode_pictures(df):
+    return 0
+
+
+
+def load_image_from_url(url, size=(128, 128)):
+    """
+    Loads an image from a URL and converts it into a NumPy array (H x W x C).
+    If loading fails, returns a black image of the given size.
+    """
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        img = Image.open(BytesIO(response.content)).convert('RGB')
+        img = img.resize(size)
+        return 1,np.array(img)
+    except Exception as e:
+        print(f"Error loading {url}: {e}. Using blank image instead.")
+        return 0,np.zeros((size[1], size[0], 3), dtype=np.uint8)  # Black image
+
+
+def add_image_arrays_column(df, url_col='image_url', size=(128,128)):
+    """
+    Adds a new column 'image_array' to df containing image data as 3D NumPy arrays.
+    """
+    df['image_array'] = df[url_col].apply(lambda x: load_image_from_url(x, size=size)[1])
+    df['Photo_available'] = df[url_col].apply(lambda x: load_image_from_url(x, size=size)[0])
+    return df
+
+#dftest = add_image_arrays_column(loaded_data.loc[0:100,:],url_col = "Photos")    
+
+def plot_images_from_df(df, image_col='image_array', max_per_row=5, figsize_per_image=(3,3)):
+    """
+    Plots images stored in a DataFrame column as NumPy arrays.
+    
+    Args:
+        df: pandas DataFrame containing image arrays.
+        image_col: column name with 3D NumPy image arrays.
+        max_per_row: maximum number of images per row.
+        figsize_per_image: size of each image in the plot (width, height in inches).
+    """
+    images = df[image_col].dropna().to_list()
+    if not images:
+        print("No images to display.")
+        return
+    
+    n_images = len(images)
+    n_cols = min(max_per_row, n_images)
+    n_rows = math.ceil(n_images / n_cols)
+    
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(figsize_per_image[0]*n_cols, figsize_per_image[1]*n_rows))
+    axes = axes.flatten() if n_images > 1 else [axes]
+    
+    for ax, img in zip(axes, images):
+        ax.imshow(img)
+        ax.axis('off')
+    
+    # Turn off any unused subplots
+    for ax in axes[len(images):]:
+        ax.axis('off')
+    
+    plt.tight_layout()
+    plt.show()
+    
+#plot_images_from_df(dftest, image_col='image_array', max_per_row=3)
+
